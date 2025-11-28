@@ -1,0 +1,10 @@
+# VSCode settings
+.vscode/
+
+# Build artifacts
+main
+*.o
+*.out
+
+# CUDA build files
+*.cu.o
