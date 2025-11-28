@@ -59,19 +59,41 @@ std::vector<double> gauss_jacobi(const std::vector<double> &A,
 }
 */
 
-std::vector<double> gauss_jacobi(const std::vector<double> &A, 
-                                  const std::vector<double> &b,
-                                  std::vector<double> x,
+__global__ void gauss_jacobi_kernel() {
+    return;
+}
+
+std::vector<double> gauss_jacobi(const std::vector<double> &A_h,
+                                  const std::vector<double> &b_h,
+                                  const std::vector<double> &x_h,
                                   int n, double tol, int max_iter = 100) {
+	// Criar copia local de x para modificar
+    std::vector<double> x = x_h;
+
 	// Alocar memoria gpu
+    double *A_d, *b_d, *x_d;
+    cudaMalloc(&A_d, n * n * sizeof(double));
+    cudaMalloc(&b_d, n * sizeof(double));
+    cudaMalloc(&x_d, n * sizeof(double));
 
 	// Transferir cpu -> gpu
+    cudaMemcpy(A_d, A_h.data(), n * n * sizeof(double), cudaMemcpyHostToDevice);
+    cudaMemcpy(b_d, b_h.data(), n * sizeof(double), cudaMemcpyHostToDevice);
+    cudaMemcpy(x_d, x_h.data(), n * sizeof(double), cudaMemcpyHostToDevice);
 
 	// Computar
+    gauss_jacobi_kernel<<<?, ?>>>();
 
 	// Transferir gpu -> cpu
+    cudaMemcpy(x.data(), x_d, n * sizeof(double), cudaMemcpyDeviceToHost);
 
 	// Free memoria gpu
+    cudaFree(A_d);
+    cudaFree(b_d);
+    cudaFree(x_d);
+
+    return x;
+    
 }
 void imprimir_sistema(const std::vector<double> &A, const std::vector<double> &b, int n) {
     std::cout << "Ax = b" << std::endl;
